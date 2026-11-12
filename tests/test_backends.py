@@ -263,7 +263,7 @@ def test_resonance_seed(backend_name, backend_context):
     np.testing.assert_allclose(weights, first_weights)
     for name in parts:
         np.testing.assert_allclose(parts[name], first_parts[name])
-    assert np.all(np.isfinite(weights))
+    assert np.all(np.isfinite(np.asarray(weights)))
 
 
 @pytest.mark.parametrize("backend_name", AVAILABLE_BACKENDS)

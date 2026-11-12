@@ -10,7 +10,7 @@
 [![Gitter chat](https://badges.gitter.im/zfit/phasespace.svg)](https://app.gitter.im/#/room/#zfit_phasespace:gitter.im)
 [![PyPI version](https://badge.fury.io/py/phasespace.svg)](https://badge.fury.io/py/phasespace)
 
-Python implementation of the Raubold and Lynch method for *n*-body events with support for multiple computational backends (TensorFlow, NumPy, JAX).
+Python implementation of the Raubold and Lynch method for *n*-body events with support for multiple computational backends (TensorFlow, NumPy, JAX, PyTorch).
 
 The code is based on the GENBOD function (W515 from CERNLIB), documented in [^1] and tries to follow it as closely as possible.
 
@@ -40,7 +40,7 @@ Lately, data analysis in High Energy Physics (HEP), traditionally performed with
 
 One of the aspects where this is still not possible is in the random generation of *n*-body phase space events, which are widely used in the field, for example to study kinematics of the particle decays of interest, or to perform importance sampling in the case of complex amplitude models. This has been traditionally done with the [TGenPhaseSpace](https://root.cern.ch/doc/master/classTGenPhaseSpace.html) class, which is based of the GENBOD function of the CERNLIB FORTRAN libraries and which requires a full working ROOT installation.
 
-This package aims to address this issue by providing an implementation of such a function, running on TensorFlow, NumPy or JAX, to generate *n*-body decays without requiring a ROOT installation. Additionally, an oft-needed functionality to generate complex decay chains, not included in `TGenPhaseSpace`, is also offered, leaving room for decaying resonances (which don't have a fixed mass, but can be seen as a broad peak).
+This package aims to address this issue by providing an implementation of such a function, running on TensorFlow, NumPy, JAX or PyTorch, to generate *n*-body decays without requiring a ROOT installation. Additionally, an oft-needed functionality to generate complex decay chains, not included in `TGenPhaseSpace`, is also offered, leaving room for decaying resonances (which don't have a fixed mass, but can be seen as a broad peak).
 
 ## Installing
 
@@ -56,16 +56,17 @@ This is the preferred method to install `phasespace`, as it will always install 
 pip install "phasespace[fromdecay]"
 ```
 
-The default installation only depends on NumPy. TensorFlow and JAX support are available through optional extras (the `fromdecay` extra already includes TensorFlow):
+The default installation only depends on NumPy. TensorFlow, JAX and PyTorch support are available through optional extras (the `fromdecay` extra already includes TensorFlow):
 
 ```shell
 pip install "phasespace[tf]"
 pip install "phasespace[jax]"
+pip install "phasespace[torch]"
 ```
 
 ## Backend Selection
 
-Phasespace supports **NumPy** (default), **TensorFlow**, and **JAX**. The backend can be selected at runtime using the public API:
+Phasespace supports **NumPy** (default), **TensorFlow**, **JAX**, and **PyTorch**. The backend can be selected at runtime using the public API:
 
 ```python
 import phasespace
@@ -85,7 +86,7 @@ Alternatively, the initial backend can also be selected through an environment v
 
 ```shell
 export PHASESPACE_BACKEND=tensorflow
-# Other choices: numpy (default), jax
+# Other choices: numpy (default), jax, torch
 ```
 
 The backend applies to the whole program, so avoid switching it while events are being generated. Arrays you already generated keep their original type. A random generator belongs to the backend it was created with, so after switching, pass an integer seed or create a new generator. The same seed gives the same events within one backend, but different backends produce different events.
@@ -108,7 +109,7 @@ KAON_MASS = 493.677
 weights, particles = phasespace.nbody_decay(B0_MASS, [PION_MASS, KAON_MASS]).generate(n_events=1000)
 ```
 
-The arrays returned by `generate` belong to the selected backend: a `tf.Tensor` with TensorFlow (convertible with `tf.Tensor.numpy()`), a NumPy array with NumPy, and a JAX array with JAX. The `generate` function returns an array of 1000 elements in the case of `weights` and a list of `n particles` (2) arrays of (1000, 4) shape, where each of the 4-dimensions corresponds to one of the components of the generated Lorentz 4-vector. All particles are generated in the rest frame of the top particle; boosting to a certain momentum (or list of momenta) can be achieved by passing the momenta to the `boost_to` argument.
+The arrays returned by `generate` belong to the selected backend: a `tf.Tensor` with TensorFlow (convertible with `tf.Tensor.numpy()`), a NumPy array with NumPy, a JAX array with JAX, and a `torch.Tensor` with PyTorch (convert with `numpy.asarray` before passing it to NumPy functions). The `generate` function returns an array of 1000 elements in the case of `weights` and a list of `n particles` (2) arrays of (1000, 4) shape, where each of the 4-dimensions corresponds to one of the components of the generated Lorentz 4-vector. All particles are generated in the rest frame of the top particle; boosting to a certain momentum (or list of momenta) can be achieved by passing the momenta to the `boost_to` argument.
 
 Sequential decays can be handled with the `GenParticle` class (used internally by `generate`) and its `set_children` method. As an example, to build the $B^{0}\to K^{*}\gamma$ decay in which $K^*\to K\pi$, we would write:
 

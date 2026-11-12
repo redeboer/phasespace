@@ -10,5 +10,7 @@ tf_only = pytest.mark.skipif(
 )
 
 AVAILABLE_BACKENDS = [
-    name for name in ("numpy", "tensorflow", "jax") if find_spec(name) is not None
+    name
+    for name in ("numpy", "tensorflow", "jax", "torch")
+    if find_spec(name) is not None
 ]

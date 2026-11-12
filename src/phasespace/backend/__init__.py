@@ -1,4 +1,4 @@
-"""Runtime backend selection and compilation for NumPy, TensorFlow, and JAX.
+"""Runtime backend selection and compilation for NumPy, TensorFlow, JAX, and PyTorch.
 
 Other `phasespace` sub-modules import from this module and `set_backend` decides which library executes it.
 Because the backend can be switched after other modules imported names from here, every public name looks up
@@ -41,14 +41,16 @@ _R = TypeVar("_R")
 
 
 def set_backend(
-    backend: Literal["tensorflow", "tf", "numpy", "np", "jax"] | BackendType,
+    backend: Literal["tensorflow", "tf", "numpy", "np", "jax", "torch", "pytorch"]
+    | BackendType,
 ) -> None:
     """Select the backend for subsequent calls, including existing decay objects.
 
     The initial backend is taken from the ``PHASESPACE_BACKEND`` environment variable and defaults to NumPy.
-    TensorFlow and JAX require the optional ``tf`` and ``jax`` extras; JAX uses double precision. Backend
-    selection is process-wide; switch outside compiled user functions and do not switch while another thread
-    is generating events. Existing arrays and random generators retain their original backend.
+    TensorFlow, JAX and PyTorch require the optional ``tf``, ``jax`` and ``torch`` extras; JAX and PyTorch use
+    double precision, and PyTorch runs eagerly on the CPU. Backend selection is process-wide; switch outside
+    compiled user functions and do not switch while another thread is generating events. Existing arrays and
+    random generators retain their original backend.
     """
     backend_type = (
         BackendType.from_string(backend) if isinstance(backend, str) else backend
@@ -70,6 +72,7 @@ class BackendType(Enum):
     NUMPY = auto()
     JAX = auto()
     TENSORFLOW = auto()
+    TORCH = auto()
 
     @staticmethod
     def from_string(backend: str) -> BackendType:
@@ -80,6 +83,8 @@ class BackendType(Enum):
             return BackendType.JAX
         if backend in {"tf", "tensorflow"}:
             return BackendType.TENSORFLOW
+        if backend in {"torch", "pytorch"}:
+            return BackendType.TORCH
         raise NotImplementedError(f'No backend implemented for "{backend}"')
 
 
@@ -201,6 +206,7 @@ def _initialize_backend(backend_type: BackendType) -> Implementation:
         BackendType.TENSORFLOW: "_tensorflow",
         BackendType.NUMPY: "_numpy",
         BackendType.JAX: "_jax",
+        BackendType.TORCH: "_torch",
     }.get(backend_type)
     if module_name is None:
         raise NotImplementedError(f"Backend {backend_type} not implemented")

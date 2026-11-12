@@ -1,5 +1,11 @@
 # Changelog
 
+## Develop
+
+### Major features and improvements
+
+- An optional PyTorch backend is available through the `torch` extra and `phasespace.set_backend("torch")`. It runs eagerly on the CPU in double precision and returns `torch.Tensor` objects.
+
 ## [2.0.0](https://github.com/zfit/phasespace/releases/tag/2.0.0) (17 Nov 2026)
 
 ### Behavioral changes
