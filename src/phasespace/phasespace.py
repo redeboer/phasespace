@@ -839,7 +839,7 @@ def to_vectors(particles: dict[str, backend.Tensor]) -> dict[str, vector.Momentu
         _raise_missing_vector_package(error)
     newparticles = {}
     for name, particle in particles.items():
-        px, py, pz, e = np.moveaxis(particle, -1, 0)  # numpy "unstack"
+        px, py, pz, e = np.moveaxis(np.asarray(particle), -1, 0)  # numpy "unstack"
         newparticles[name] = vector.array({"px": px, "py": py, "pz": pz, "energy": e})
     return newparticles
 

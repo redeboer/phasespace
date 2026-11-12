@@ -1,4 +1,4 @@
-"""Phase space generation with TensorFlow, NumPy, and JAX."""
+"""Phase space generation with TensorFlow, NumPy, JAX, and PyTorch."""
 
 from importlib.metadata import PackageNotFoundError, version
 

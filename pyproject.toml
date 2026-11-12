@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "phasespace"
-description = "Raubold and Lynch n-body phase space generation with TensorFlow, NumPy, and JAX"
+description = "Raubold and Lynch n-body phase space generation with TensorFlow, NumPy, JAX, and PyTorch"
 authors = [{ name = "Albert Puig Navarro", email = "apuignav@gmail.com" }]
 maintainers = [{ name = "zfit", email = "zfit@physik.uzh.ch" }]
 license = "BSD-3-Clause"
@@ -34,6 +34,7 @@ content-type = "text/x-rst"
 
 [project.optional-dependencies]
 jax = ["jax>=0.4.18"]
+torch = ["torch>=2.1"]
 tf = [
     "tensorflow >=2.19.0",
     "tensorflow_probability >=0.25.0",
@@ -52,6 +53,7 @@ all = [
     "phasespace[vector]",
     "phasespace[tf]",
     "phasespace[jax]",
+    "phasespace[torch]",
 ]
 
 [dependency-groups]

@@ -7,7 +7,7 @@ import tensorflow as tf
 import tensorflow.experimental.numpy as tnp
 from particle import Particle
 
-from phasespace import GenParticle
+from phasespace import GenParticle, backend
 
 from .mass_functions import DEFAULT_CONVERTER
 
@@ -191,7 +191,9 @@ class GenMultiDecay:
             events.append(four_vectors)
 
         if normalize_weights:
-            total_max = tnp.max([tnp.max(mw) for mw in max_weights])
+            total_max = backend.tnp.max(
+                backend.tnp.stack([backend.tnp.max(mw) for mw in max_weights])
+            )
             normed_weights = [w / total_max for w in weights]
             return normed_weights, events
 

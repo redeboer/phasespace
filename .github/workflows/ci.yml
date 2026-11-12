@@ -151,3 +151,8 @@ jobs:
           PHASESPACE_BACKEND: jax
         run: pytest -n auto tests
         shell: bash
+      - name: Test with pytest (PyTorch backend)
+        env:
+          PHASESPACE_BACKEND: torch
+        run: pytest -n auto tests
+        shell: bash

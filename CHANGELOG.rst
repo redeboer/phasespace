@@ -8,7 +8,7 @@ Develop
 Major Features and Improvements
 -------------------------------
 
-- Add NumPy and optional JAX backends alongside TensorFlow, with runtime backend selection through ``phasespace.set_backend`` and ``phasespace.get_backend``. Existing decay objects can be reused after switching.
+- Add NumPy and optional JAX and PyTorch backends alongside TensorFlow, with runtime backend selection through ``phasespace.set_backend`` and ``phasespace.get_backend``. Existing decay objects can be reused after switching.
 
 Behavioral changes
 ------------------

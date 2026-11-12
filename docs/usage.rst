@@ -196,7 +196,7 @@ In this example, ``decay`` is simply a ``GenParticle`` with the corresponding ch
 Choosing a backend
 ------------------
 
-Events are generated with NumPy by default, but TensorFlow and JAX can be selected with :func:`phasespace.set_backend`. Decay objects that already exist, such as ``decay`` above, can be reused after switching, and the returned arrays are of the selected backend's type:
+Events are generated with NumPy by default, but TensorFlow, JAX and PyTorch can be selected with :func:`phasespace.set_backend`. Decay objects that already exist, such as ``decay`` above, can be reused after switching, and the returned arrays are of the selected backend's type:
 
 .. jupyter-execute::
 

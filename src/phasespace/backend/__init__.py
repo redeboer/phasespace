@@ -1,4 +1,4 @@
-"""Runtime backend selection and compilation for NumPy, TensorFlow, and JAX."""
+"""Runtime backend selection and compilation for NumPy, TensorFlow, JAX, and PyTorch."""
 
 from __future__ import annotations
 
@@ -34,6 +34,7 @@ class BackendType(Enum):
     TENSORFLOW = auto()
     NUMPY = auto()
     JAX = auto()
+    TORCH = auto()
 
     @staticmethod
     def from_string(backend: str) -> BackendType:
@@ -44,6 +45,8 @@ class BackendType(Enum):
             return BackendType.JAX
         if backend in {"tf", "tensorflow"}:
             return BackendType.TENSORFLOW
+        if backend in {"torch", "pytorch"}:
+            return BackendType.TORCH
         raise NotImplementedError(f'No backend implemented for "{backend}"')
 
 
@@ -97,6 +100,17 @@ def _initialize_backend(backend_type):
         jax.config.update("jax_enable_x64", True)
         return SimpleNamespace(
             array=jnp, random=_jax_random, Tensor=jax.Array, Variable=jax.Array
+        )
+    if backend_type == BackendType.TORCH:
+        import torch
+
+        from . import _torch_numpy, _torch_random
+
+        return SimpleNamespace(
+            array=_torch_numpy,
+            random=_torch_random,
+            Tensor=torch.Tensor,
+            Variable=torch.Tensor,
         )
     raise NotImplementedError(f"Backend {backend_type} not implemented")
 
@@ -153,7 +167,7 @@ def as_event_count(n_events):
 def get_shape(array):
     if BACKEND == BackendType.TENSORFLOW:
         return _implementation.shape(array)
-    return np.shape(array)
+    return tuple(array.shape)
 
 
 def assert_equal(x, y, message="", name=None):
@@ -174,14 +188,15 @@ def get_backend() -> BackendType:
 
 
 def set_backend(
-    backend: Literal["tensorflow", "tf", "numpy", "np", "jax"] | BackendType,
+    backend: Literal["tensorflow", "tf", "numpy", "np", "jax", "torch", "pytorch"]
+    | BackendType,
 ) -> None:
     """Select the backend for subsequent calls, including existing decay objects.
 
-    NumPy is the default. TensorFlow and JAX require the optional ``tf`` and ``jax`` extras; JAX uses double
-    precision. Backend selection is process-wide; switch outside compiled user functions and do not switch
-    while another thread is generating events. Existing arrays and random generators retain their original
-    backend.
+    NumPy is the default. TensorFlow, JAX and PyTorch require the optional ``tf``, ``jax`` and ``torch``
+    extras; JAX and PyTorch use double precision, and PyTorch runs eagerly on the CPU. Backend selection is
+    process-wide; switch outside compiled user functions and do not switch while another thread is
+    generating events. Existing arrays and random generators retain their original backend.
     """
     global BACKEND, Tensor, Variable, _implementation, _generation
     backend_type = (
